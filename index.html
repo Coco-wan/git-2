@@ -1,7 +1,7 @@
 <html>
   <head>
 	  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>i5ting_ztree_toc:README</title>
+    <title>i5ting_ztree_toc:git</title>
 		<link href="toc/style/github-bf51422f4bb36427d391e4b75a1daa083c2d840e.css" media="all" rel="stylesheet" type="text/css"/>
 		<link href="toc/style/github2-d731afd4f624c99a4b19ad69f3083cd6d02b81d5.css" media="all" rel="stylesheet" type="text/css"/>
 		<link href="toc/css/zTreeStyle/zTreeStyle.css" media="all" rel="stylesheet" type="text/css"/>
@@ -65,7 +65,411 @@
 				</div>
         <div id='readme' style='width:70%;margin-left:20%;'>
           	<article class='markdown-body'>
-            	<p>git 学习笔记：　<a href="http://mwn-notes.github.io/git/">http://mwn-notes.github.io/git/</a></p>
+            	<h1 id="-">起步</h1>
+<h2 id="-">安装</h2>
+<p><code>$ apt-get install git</code></p>
+<h2 id="-">配置</h2>
+<ul>
+<li><p>配置文件</p>
+<p><code>/etc/gitconfig</code>：</p>
+<p>系统中对所有用户都普遍适用的配置。读写 <code>git config --system</code></p>
+<p><code>~/.gitconfig</code>：</p>
+<p>用户目录下的配置文件只适用于该用户。读写 <code>git config --global</code></p>
+<p><code>.git/config</code>：</p>
+<p>这里的配置仅仅针对当前项目有效。读写 <code>git config</code></p>
+</li>
+<li><p>用户信息</p>
+<p>个人的用户名称和电子邮件地址，这两条配置很重要，每次 Git 提交时都会引用这两条
+信息，说明是谁提交了更新，所以会随更新内容一起被永久纳入历史记录：</p>
+<pre><code>$ git config --global user.name &quot;John Doe&quot;
+$ git config --global user.email johndoe@example.com
+</code></pre></li>
+<li><p>命令别名</p>
+<pre><code>$ git config --global alias.co checkout
+$ git config --global alias.br branch
+$ git config --global alias.ci commit
+$ git config --global alias.st status
+
+$ git config --global alias.unstage &#39;reset HEAD --&#39;
+$ git config --global alias.last &#39;log -1 HEAD&#39;
+</code></pre><p>现在，如果要输入 git commit 只需键入 git ci 即可。</p>
+<p>有时候我们希望运行某个外部命令，而非 Git 的子命令，只需要在命令前加上 ! 就行。</p>
+<p>例如，我们可以设置用 git visual 启动 gitk</p>
+<pre><code>$ git config --global alias.visual &#39;!gitk&#39;
+</code></pre></li>
+<li><p>查看配置信息</p>
+<p><code>$ git config --list</code></p>
+</li>
+</ul>
+<h2 id="-">避免密码</h2>
+<ul>
+<li><p>在宿主目录下创建文件存储GIT用户名和密码</p>
+<pre><code>cd ~
+vim .git-credentials
+    https://username:password@github.com
+    https://username:password@git.oschina.net
+</code></pre></li>
+<li><p>添加Git Config 内容</p>
+<pre><code>git config --global credential.helper store
+</code></pre><p>执行完后查看~目录下的.gitconfig文件，会多了一项：</p>
+<pre><code>[credential]
+    helper = store
+</code></pre><p>重新开启bash会发现git push时不用再输入用户名和密码</p>
+</li>
+<li><p>详情</p>
+<p><a href="http://www.cnblogs.com/ballwql/p/3462104.html">http://www.cnblogs.com/ballwql/p/3462104.html</a></p>
+</li>
+</ul>
+<h2 id="-">查看帮助</h2>
+<p>三种方法：</p>
+<p><code>$ git help &lt;verb&gt;</code></p>
+<p><code>$ git &lt;verb&gt; --help</code></p>
+<p><code>$ man git-&lt;verb&gt;</code></p>
+<h2 id="-">忽略规则</h2>
+<pre><code>1.  忽略文件中的空行或以井号（#）开始的行将会被忽略。
+2.  可以使用Linux通配符。例如：星号（*）代表任意多个字符，问号（？）代表一个字符，方括号（[abc]）代表可选字符范围，
+    大括号（{string1,string2,...}）代表可选的字符串等。
+3.  如果名称的最前面有一个感叹号（!），表示例外规则，将不被忽略。
+4.  如果名称的最前面是一个路径分隔符（/），表示要忽略的文件在此目录下，而子目录中的文件不忽略。
+5.  如果名称的最后面是一个路径分隔符（/），表示要忽略的是此目录下该名称的子目录，而非文件（默认文件或目录都忽略）。
+</code></pre><p>示例：</p>
+<pre><code># 这是注释行，将被忽略
+*.a       # 忽略所有以.a为扩展名的文件
+!lib.a    # 但是名为lib.a的文件或目录不要忽略，即使前面设置了对*.a的忽略
+/TODO     # 只忽略此目录下的TODO文件，子目录中的TODO文件不忽略
+build/    # 忽略所有build目录下的文件，但如果是名为build的文件则不忽略
+doc/*.txt # 忽略文件如doc/notes.txt，但是文件如doc/server/arch.txt不忽略
+</code></pre><h1 id="-">仓库</h1>
+<h2 id="-">创建新仓库</h2>
+<p><code>$ git init</code></p>
+<h2 id="-">克隆仓库</h2>
+<p><code>$ git clone git://github.com/schacon/grit.git</code></p>
+<p>Git 支持许多数据传输协议：</p>
+<ul>
+<li>git:// </li>
+<li>http(s):// </li>
+<li>user@server:/path.git 表示的 SSH 传输协议。</li>
+</ul>
+<h2 id="-">查看当前的远程库</h2>
+<p><code>git remote [-v]</code></p>
+<p>Git 默认使用 origin 来标识你所克隆的原始仓库</p>
+<p>加上 -v 选项，显示对应的克隆地址</p>
+<p><code>git remote show [remote-name]</code></p>
+<p>查看远程仓库信息</p>
+<h1 id="-">分支</h1>
+<h2 id="-">查看分支</h2>
+<p>查看本地分支：<code>git branch</code></p>
+<p>查看远程分支：<code>git branch -r</code></p>
+<p>查看所有分支：<code>git branch -a</code></p>
+<p>查看哪些分支已被并入当前分支：<code>git branch --merge</code></p>
+<p>查看尚未合并的工作：<code>git branch --no-merged</code></p>
+<h2 id="-">创建分支</h2>
+<p>创建本地分支：<code>git branch &lt;branch&gt;</code> </p>
+<p>基于本地分支创建远程分支： <code>git push --set-upstream origin &lt;branch&gt;</code></p>
+<p>切换分支：<code>git checkout &lt;branch&gt;</code></p>
+<p>基于当前分支创建并切换到新分支：<code>git checkout -b &lt;branch&gt;</code></p>
+<p>跟踪远程分支： <code>git checkout --track origin/&lt;branch&gt;</code> </p>
+<p>重命名本地分支：<code>git branch -m &lt;oldname&gt; &lt;newname&gt;</code></p>
+<h2 id="-">删除分支</h2>
+<p>删除本地分支：<code>git branch -d &lt;branch&gt;</code></p>
+<p>git branch -d 删除未合并进来的分支会提示错误，可以用大写的删除选项 -D 强制执行</p>
+<p>删除远程分支：</p>
+<pre><code>git branch -r -d origin/&lt;branch&gt;
+git push origin :&lt;branch&gt;
+
+注：冒号前面必须输入一个空格！
+</code></pre><h2 id="-">合并分支</h2>
+<p>要合并其他分支到当前分支：<code>git merge &lt;branch&gt;</code></p>
+<p>注：自动合并并非次次都能成功，并可能导致 冲突（conflicts）</p>
+<p>在合并改动之前，也可以使用如下命令查看：<code>git diff &lt;source_branch&gt; &lt;target_branch&gt;</code></p>
+<p>任何包含未解决冲突的文件都会以未合并（unmerged）的状态列出。Git 会在有冲突的文件里加入标准的
+冲突解决标记，可以通过它们来手工定位并解决这些冲突。可以看到此文件包含类似下面这样的部分：</p>
+<p><code>$ git merge iss53</code> </p>
+<pre><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD:index.html
+    &lt;div id=&quot;footer&quot;&gt;contact : email.support@github.com&lt;/div&gt;
+    =======
+    &lt;div id=&quot;footer&quot;&gt;
+    please contact us at support@github.com
+    &lt;/div&gt;
+    &gt;&gt;&gt;&gt;&gt;&gt;&gt; iss53:index.html
+</code></pre><p>可以看到 ======= 隔开的上半部分，是 HEAD（即 master 分支，在运行 merge 命令时所切换到的分
+支）中的内容，下半部分是在 iss53 分支中的内容。解决冲突的办法无非是二者选其一或者由你亲自整合
+到一起。</p>
+<h2 id="-">衍合分支</h2>
+<p><code>$ git rebase master</code></p>
+<h2 id="-">上行分支</h2>
+<p>设置：</p>
+<p><code>$ git push --set-upstream origin &lt;branch&gt;</code></p>
+<p>取消设置：</p>
+<p><code>$ git branch --unset-upstream&quot;</code></p>
+<h1 id="-">基础</h1>
+<h2 id="-">检查当前文件状态</h2>
+<p><code>$ git status</code></p>
+<h2 id="-">跟踪新文件或暂存已修改文件</h2>
+<p><code>$ git add benchmarks.rb</code></p>
+<p>git add 命令是个多功能命令，根据目标文件的状态不同，此命令的效果也不同：</p>
+<ol>
+<li>可以用它开始跟踪新文件</li>
+<li>把已跟踪的文件放到暂存区</li>
+<li>合并时把有冲突的文件标记为已解决状态。</li>
+</ol>
+<h2 id="-">提交更新</h2>
+<p>启动文本编辑器以便输入本次提交的说明</p>
+<p><code>$ git commit</code></p>
+<p>另外也可以用 -m 参数后跟提交说明的方式，在一行命令中提交更新：</p>
+<p><code>$ git commit -m &quot;Story 182: Fix benchmarks for speed&quot;</code></p>
+<p>跳过使用暂存区域，Git 就会自动把所有已经跟踪过的文件暂存起来一并提交</p>
+<p><code>$ git commit -a -m &#39;added new benchmarks&#39;</code></p>
+<h2 id="-">推送数据到远程仓库</h2>
+<p><code>$ git push [remote-name] [branch-name]</code></p>
+<h2 id="-">从远程仓库抓取数据</h2>
+<p><code>$ git fetch</code></p>
+<p>fetch 命令只是将远端的数据拉到本地仓库，并不自动合并到当前工作分支</p>
+<p><code>$ git pull</code></p>
+<p>git pull 命令自动抓取数据下来，然后将远端分支自动合并到本地仓库中当前分支</p>
+<h2 id="-">暂存改动</h2>
+<p>经常有这样的事情发生，当你正在进行项目中某一部分的工作，里面的东西处于一个比较杂乱的状态，而你想转
+到其他分支上进行一些工作。问题是，你不想提交进行了一半的工作，否则以后你无法回到这个工作点。
+解决这个问题的办法就是 <code>git stash</code> 命令。</p>
+<p>储藏： <code>git stash</code></p>
+<p>查看： <code>git stash list</code></p>
+<p>取出： <code>git stash pop</code></p>
+<h1 id="-">修改</h1>
+<h2 id="-">移除文件</h2>
+<p><code>$ git rm grit.gemspec</code></p>
+<p>如果删除之前修改过并且已经放到暂存区域的话，则必须要用强制删除选项 -f ，以防误删除文件后丢失修改
+的内容：</p>
+<p><code>$ git rm -f grit.gemspec</code></p>
+<p>把文件从 Git 仓库中删除（亦即从暂存区域移除），但仍然希望保留在当前工作目录中。
+换句话说，仅是从跟踪清单中删除：</p>
+<p><code>$ git rm --cached readme.txt</code></p>
+<h2 id="-">移动文件</h2>
+<p><code>$ git mv file_from file_to</code></p>
+<h2 id="-">撤销操作</h2>
+<p>取消对文件的修改：</p>
+<p><code>git checkout -- &lt;file&gt;...</code></p>
+<p>取消已经暂存的文件：</p>
+<p><code>git reset HEAD &lt;file&gt;...</code></p>
+<p>重新提交：</p>
+<p><code>$ git commit --amend</code></p>
+<h2 id="-">忽略某些文件</h2>
+<p>可以创建一个名为 <code>.gitignore</code> 的文件</p>
+<p>格式规范：</p>
+<ul>
+<li>所有空行或者以注释符号 ＃ 开头的行都会被 Git 忽略。</li>
+<li>可以使用标准的 glob 模式匹配。</li>
+<li>匹配模式最后跟反斜杠（/）说明要忽略的是目录。</li>
+<li>要忽略指定模式以外的文件或目录，可以在模式前加上惊叹号（!）取反。</li>
+</ul>
+<p>glob 模式是指 shell 所使用的简化了的正则表达式：</p>
+<ul>
+<li>星号（*）匹配零个或多个任意字符；</li>
+<li>问号（?）只匹配一个任意字符；</li>
+<li>[abc] 匹配任何一个列在方括号中的字符；</li>
+<li>如果在方括号中使用短划线分隔两个字符，表示所有在这两个字符范围内的都可以匹配</li>
+</ul>
+<h1 id="-">查看</h1>
+<h2 id="-">查看已暂存和未暂存的更新</h2>
+<p>比较工作目录中当前文件和暂存区域快照之间的差异：</p>
+<p><code>$ git diff</code></p>
+<p>比较已经暂存起来的文件和上次提交时的快照之间的差异:</p>
+<p><code>$ git diff --cached</code></p>
+<p>查看分支之间的差异：</p>
+<p><code>$ git diff &lt;source_branch&gt; &lt;target_branch&gt;</code></p>
+<h2 id="-">查看提交历史</h2>
+<p>默认不用任何参数的话，git log 会按提交时间列出所有的更新，最近的更新排在最上面：</p>
+<p><code>$ git log</code></p>
+<ul>
+<li><p>常用选项</p>
+<pre><code>选项 说明
+    -p 按补丁格式显示每个更新之间的差异。
+    --stat 显示每次更新的文件修改统计信息。
+    --shortstat 只显示 --stat 中最后的行数修改添加移除统计。
+    --name-only 仅在提交信息后显示已修改的文件清单。
+    --name-status 显示新增、修改、删除的文件清单。
+    --abbrev-commit 仅显示 SHA-1 的前几个字符，而非所有的 40 个字符。
+    --relative-date 使用较短的相对时间显示（比如，“2 weeks ago”）。
+    --graph 显示 ASCII 图形表示的分支合并历史。
+    --pretty  使用其他格式显示历史提交信息。可用的选项包括 oneline，short，full，
+              fuller 和 format（后跟指定格式）。
+</code></pre></li>
+<li><p>限制输出长度</p>
+<pre><code>选项 说明
+    -(n) 仅显示最近的 n 条提交
+    --since, --after 仅显示指定时间之后的提交。
+    --until, --before 仅显示指定时间之前的提交。
+    --author 仅显示指定作者相关的提交。
+    --committer 仅显示指定提交者相关的提交。
+</code></pre></li>
+<li><p><code>-p</code></p>
+<p>选项展开显示每次提交的内容差异</p>
+</li>
+<li><p><code>-&lt;n&gt;</code></p>
+<p>仅显示最近的若干条提交</p>
+</li>
+<li><p><code>--stat</code></p>
+<p>仅显示简要的增改行数统计</p>
+</li>
+<li><p><code>--pretty</code></p>
+<p>可以指定使用完全不同于默认格式的方式展示提交历史。</p>
+<p>比如 oneline, short, full, fuller, format 等</p>
+</li>
+</ul>
+<ul>
+<li><p><code>--pretty=format</code></p>
+<pre><code>$ git log --pretty=format:&quot;%h - %an, %ar : %s&quot;
+    ca82a6d - Scott Chacon, 11 months ago : changed the version number
+    085bb3b - Scott Chacon, 11 months ago : removed unnecessary test code
+    a11bef0 - Scott Chacon, 11 months ago : first commit
+</code></pre><p>常用的格式占位符写法及其代表的意义:</p>
+<pre><code>选项 说明
+    %H 提交对象（commit）的完整哈希字串
+    %h 提交对象的简短哈希字串
+    %T 树对象（tree）的完整哈希字串
+    %t 树对象的简短哈希字串
+    %P 父对象（parent）的完整哈希字串
+    %p 父对象的简短哈希字串
+    %an 作者（author）的名字
+    %ae 作者的电子邮件地址
+    %ad 作者修订日期（可以用 -date= 选项定制格式）
+    %ar 作者修订日期，按多久以前的方式显示
+    %cn 提交者(committer)的名字
+    %ce 提交者的电子邮件地址
+    %cd 提交日期
+    %cr 提交日期，按多久以前的方式显示
+    %s 提交说明
+</code></pre></li>
+<li><p><code>--graph</code></p>
+<p>用 oneline 或 format 时结合 --graph 选项，可以看到开头多出一些 ASCII 字符串表示的简单
+图形，形象地展示了每个提交所在的分支及其分化衍合情况。</p>
+<pre><code>$ git log --pretty=format:&quot;%h %s&quot; --graph
+    * 2d3acf9 ignore errors from SIGCHLD on trap
+    * 5e3ee11 Merge branch &#39;master&#39; of git://github.com/dustin/grit
+    |\
+    | * 420eac9 Added a method for getting the current branch.
+    * | 30e367c timeout code and tests
+    * | 5a09431 add timeout protection to grit
+    * | e1193f8 support for heads with slashes in them
+    |/
+    * d6016bc require time for xmlschema
+    * 11d191e Merge branch &#39;defunkt&#39; into local
+</code></pre></li>
+</ul>
+<h1 id="git-extras">git-extras</h1>
+<h2 id="-">基础</h2>
+<ul>
+<li><p>安装</p>
+<p><code>$ sudo apt-get install git-extras</code></p>
+</li>
+<li><p>查看帮助</p>
+<p><code>$ git-extras</code></p>
+</li>
+<li><p>创建仓库</p>
+<p><code>$ git-setup</code></p>
+</li>
+<li><p>命令别名</p>
+<p><code>$ git-alias</code></p>
+</li>
+<li><p>生成修改日志</p>
+<p><code>$ git-changelog</code></p>
+</li>
+<li><p>基于当前仓库打包压缩文件</p>
+<p><code>$ git-archive-file</code></p>
+</li>
+</ul>
+<h2 id="-">查看</h2>
+<ul>
+<li><p>仓库基本信息</p>
+<p><code>$ git-info</code></p>
+</li>
+<li><p>仓库基本状态</p>
+<p><code>$ git-summary</code></p>
+</li>
+<li><p>查看某个作者的贡献</p>
+<p><code>$ git-contrib &lt;author&gt;</code></p>
+</li>
+<li><p>从一个时间点查看提交</p>
+<p><code>$ git-commits-since [last week | yesterday]</code></p>
+</li>
+<li><p>查看本地提交</p>
+<p><code>$ git-local-commits</code></p>
+</li>
+<li><p>查看提交树</p>
+<p><code>$ git-show-tree</code></p>
+</li>
+<li><p>提交总数</p>
+<p><code>$ git-count [--all]</code></p>
+</li>
+</ul>
+<h2 id="-">文件</h2>
+<ul>
+<li><p>添加忽略</p>
+<p><code>$ git-ignore</code></p>
+</li>
+<li><p>文件基本状态</p>
+<p><code>$ git-effort [--above &lt;number&gt;]</code></p>
+</li>
+<li><p>创建并追踪新文件</p>
+<p><code>$ git-touch</code></p>
+</li>
+<li><p>完全地移除一个文件（包括仓库和提交）</p>
+<p><code>$ git-obliterate</code></p>
+</li>
+</ul>
+<h2 id="-">提交</h2>
+<ul>
+<li><p>撤销上次提交</p>
+<p><code>$ git-back</code></p>
+</li>
+<li><p>撤销 n 次提交</p>
+<p><code>$ git-undo &lt;number&gt;</code></p>
+<p>生成内容会保存在 History.md 中</p>
+</li>
+<li><p>合并提交</p>
+<p><code>$ git-graft src dest</code></p>
+</li>
+<li><p>合并多个提交成为一个提交</p>
+<p><code>$ git-squash src-branch &#39;message&#39;</code></p>
+</li>
+</ul>
+<h2 id="-">分支</h2>
+<ul>
+<li><p>创建空的本地分支</p>
+<p><code>$ git-fresh-branch</code></p>
+</li>
+<li><p>创建本地以及远程分支</p>
+<p><code>$ git-create-branch &lt;name&gt;</code></p>
+</li>
+<li><p>合并分支</p>
+<p><code>$ git-merge-into [src] dest</code></p>
+</li>
+<li><p>删除本地以及远程分支</p>
+<p><code>$ git-delete-branch &lt;name&gt;</code></p>
+</li>
+<li><p>删除所有已合并分支</p>
+<p><code>$ git-delete-merged-branches</code></p>
+<p>查看已合并分支列表： <code>$ git branch --merged</code></p>
+</li>
+</ul>
+<h1 id="gitignore-io">gitignore.io</h1>
+<h2 id="-">基础</h2>
+<ul>
+<li><p>安装</p>
+<p>bash</p>
+<p><code>$ echo &quot;function gi() { curl -L -s https://www.gitignore.io/api/\$@ ;}&quot; &gt;&gt; ~/.bashrc &amp;&amp; source ~/.bashrc</code></p>
+<p>zsh</p>
+<p><code>$ echo &quot;function gi() { curl -L -s https://www.gitignore.io/api/\$@ ;}&quot; &gt;&gt; ~/.zshrc &amp;&amp; source ~/.zshrc</code></p>
+</li>
+</ul>
+<h2 id="-">生成</h2>
+<ul>
+<li><p>项目类型列表</p>
+<p><code>$ gi list</code></p>
+</li>
+<li><p>输出重定向到 .gitignore</p>
+<p>$ gi bower,node &gt;&gt; .gitignore</p>
+</li>
+</ul>
 
           	</article>
         </div>
